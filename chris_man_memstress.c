@@ -102,23 +102,20 @@ int chris_man_retention( double riseTime, double widthTime, double delayTime, in
 {
 /* USRLIB MODULE CODE */
 int stat;
-static const uint64_t EPOCH = ((uint64_t) 116444736000000000ULL);
-
   //we add desc in comments
   resetV *= -1.0;
   int measCH = 2;
-
-
-
-while(1){
-  char mod[] = "chris_man_retention";
-  stat = -1;
-  double resetIMeas[MAX_OUT_PTS];
+  char mod[] = "chris_man_memstress";
   double voffset;
   double ioffset;
   double resetr;
   double ttime;
-    double reset_sign; //set_sign;
+  double reset_sign; //set_sign;
+
+
+
+while(1){
+  stat = -1;
   
   //Setup NVM structures
   NVMS *nvm;
