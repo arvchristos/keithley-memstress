@@ -145,8 +145,6 @@ while(1){
   //make sure miniminum width is 20 ns
   if(widthTime < 2e-8) widthTime = 2e-8;
   
-  if(useSmu==0)
-    {
       //Initialize NVM using 1 PMU
       nvm = initNVMST(1);
       
@@ -159,6 +157,7 @@ while(1){
         stat = NVM_INITIALIZE_ERROR; goto RETURN;
         }
       nlog("%s: starts\n", mod);
+      
       
       //Find PMU
       pmu1 = getPMU(1);
@@ -253,7 +252,7 @@ while(1){
            ioffset, voffset);
     
         devint();
-               } 
+     
          nlog("-----------------------------------------------------------------\n");
 
   //Determine the resistance of the device
