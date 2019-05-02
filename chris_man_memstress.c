@@ -1,25 +1,30 @@
 /* USRLIB MODULE INFORMATION
 
-	MODULE NAME: chris_man_retention
+	MODULE NAME: chris_man_memstress
 	MODULE RETURN TYPE: int 
-	NUMBER OF PARMS: 16
+	NUMBER OF PARMS: 21
 	ARGUMENTS:
 		riseTime,	double,	Input,	1e-4,	20e-9,	
 		widthTime,	double,	Input,	1e-6,	20e-9,	
 		delayTime,	double,	Input,	1e-4,	20e-9,	
 		complianceCH,	int,	Input,	2,	1,	2
 		resetV,	double,	Input,	-2.5,	-20,	20
+		Vin,	double,	Input,	0.0,	-20,	20
 		Irange,	double,	Input,	1e-2,	0.0,	1
 		resetIcomp,	double,	Input,	0.0,	-0.1,	0.1
-		resTestV,	double,	Input,	2,	-10,	10
+		resTestV,	double,	Input,	0.5,	-10,	10
 		takeRmeas,	int,	Input,	1,	0,	1
-		useSmu,	int,	Input,	0,	0,	1
 		pts,	int *,	Output,	,	,	
 		resetResistance,	double *,	Output,	,	,	
-		time_limit,	int,	Input,	1,	0,	1800
-		TimeRES,	double *,	Output,	,	,	
 		Out_size,	D_ARRAY_T,	Output,	,	,	
 		Out_size_val,	int,	Input,	,	,	
+		zone_low,	double,	Input,	0,	,	
+		zone_high,	double,	Input,	0,	,	
+		stepIncrement,	double,	Input,	0,	,	
+		Vforce,	double *,	Output,	,	,	
+		Verifying_pulses,	int *,	Output,	,	,	
+		Resistance_diff,	double *,	Output,	,	,	
+		loop_num,	int,	Input,	1,	1,	1000
 	INCLUDES:
 #include "keithley.h"
 #include "nvm.h"
@@ -30,7 +35,7 @@
 /* USRLIB MODULE HELP DESCRIPTION
 DESCRIPTION:
 ------------
-The chris_man_retention sweep is used to perform a double sweep with a flat section at the peak of each sweep.To test a reram device, choose appropriate values for the two peaks, either positive or negative, and then set the timing you would like to implement.
+The chris_man_memstress sweep is used to perform a double sweep with a flat section at the peak of each sweep.To test a reram device, choose appropriate values for the two peaks, either positive or negative, and then set the timing you would like to implement.
 
 Note: In the test it is assumed that RPM1 is linked with SMU1 and RPM2 is linked with SMU2.  It is assumed that RPM1 (Channel 1) is connected to the side of the dut with higher capacitance, such as chuck, substrate, which is usually a *lower/bottom side*.  RPM2 (Channel 2) should be connected on the opposite side, which is usually its *top side* to minimize parasitic current transients. Channel 2 forces 0 V and is used to measure current.  If useSmu = 1, SMU1 and SMU2 are used for force voltage and measure current.   If useSmu = 0, pulse force/measurement is performed with PMU.  Voltage bias polarities should be applied, as if bias is applied from the top to simulate standard SMU/DC testing.  Polarities of the forced bias and measured current inverted in the code if you are using the PMU instead of SMU (useSmu = 0).
 
@@ -98,8 +103,9 @@ Function returns error status, where:
 #include <Windows.h>
 #include <stdint.h>
 
-int chris_man_retention( double riseTime, double widthTime, double delayTime, int complianceCH, double resetV, double Irange, double resetIcomp, double resTestV, int takeRmeas, int useSmu, int *pts, double *resetResistance, int time_limit, double *TimeRES, double *Out_size, int Out_size_val )
+int chris_man_memstress( double riseTime, double widthTime, double delayTime, int complianceCH, double resetV, double Vin, double Irange, double resetIcomp, double resTestV, int takeRmeas, int *pts, double *resetResistance, double *Out_size, int Out_size_val, double zone_low, double zone_high, double stepIncrement, double *Vforce, int *Verifying_pulses, double *Resistance_diff, int loop_num )
 {
+/* USRLIB MODULE CODE */
 /* USRLIB MODULE CODE */
 int stat;
   //we add desc in comments
@@ -109,7 +115,7 @@ int stat;
   char mod[] = "chris_man_memstress";
   double voffset;
   double ioffset;
-  double resetr;
+  //double resetr;
   double ttime;
   
   //Setup NVM structures
@@ -126,12 +132,15 @@ int stat;
   int prionia_limit = 100; //limit for number of pulses (steps) in each prioni
 
 //input_variables
-  double zone_high = zone_low + zone_range; //upper bound of input zone ranged from zone low to high 
+ // double zone_high = zone_low + zone_range; //upper bound of input zone ranged from zone low to high 
 //initV // field of gui that is the starting Voltage on each prioni
   double V_after_step = Vin; 
 
   double prev_resistance ;
 
+    //output
+    double V_after_step_resistance;
+for(int iter=0; iter<loop_num; iter++){    
 prionia_counter = 0;
 while(prionia_counter < prionia_limit){
   stat = -1;
@@ -273,7 +282,7 @@ while(prionia_counter < prionia_limit){
       stat = getRes2( "SMU2", "SMU1", resTestV, &V_after_step_resistance );
       *resetResistance = V_after_step_resistance; //not sure if needed !!
       PostDataDouble("resetResistance", V_after_step_resistance);
-      PostDataDouble("Vforce", V_after_step); //post the corresponding Voltage for this prioni step
+      PostDataDouble("Vforce", (-1)*V_after_step); //post the corresponding Voltage for this prioni step
     }
 
        //increment counter for each prioni count
@@ -419,15 +428,15 @@ while(prionia_counter < prionia_limit){
                                   stat = getRes2( "SMU2", "SMU1", resTestV, &V_after_step_resistance );
                                   *resetResistance = V_after_step_resistance; //not sure if needed !!
                                   PostDataDouble("resetResistance", V_after_step_resistance);
-                                  PostDataDouble("Vforce", (-1)*resetV); //post the resetv Voltage for this prioni step above range
-                                    PostDataDouble("Verifying_pulses", prionia_counter); //post the number of pulses sent
+                                  PostDataDouble("Vforce", resetV); //post the resetv Voltage for this prioni step above range
+                                    PostDataInt("Verifying_pulses", prionia_counter); //post the number of pulses sent
 
                                     if (prev_resistance < zone_high)
                                   {
-                                    PostDataDouble("Resistance diff", V_after_step_resistance - prev_resistance); //post the difference for resistances
+                                    PostDataDouble("Resistance_diff", V_after_step_resistance - prev_resistance); //post the difference for resistances
                                   }
                                   else{
-                                    PostDataDouble("Resistance diff", -1.0); //-1.0 equivalent to null
+                                    PostDataDouble("Resistance_diff", -1.0); //-1.0 equivalent to null
                                   }
                                   break; // go to next prioni 
 
@@ -442,10 +451,11 @@ while(prionia_counter < prionia_limit){
       nlog("%s: exiting with status:%d\n", mod, stat);
 
 
+ }
 }
  RETURN:
   //printNVMST();
   return stat;
 /* USRLIB MODULE END  */
-} 		/* End chris_man_retention.c */
+} 		/* End chris_man_memstress.c */
 
