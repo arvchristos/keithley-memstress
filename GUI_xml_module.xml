@@ -1,0 +1,54 @@
+  <Module name="chris_man_memstress">
+    <image file="C:\s4200\kiuser\usrlib\nvm\src\2_terminal_ReRAM.bmp" sizeable="Yes" />
+    <Group name="Timing" position="1">
+      <param name="widthTime" value="5.0e-6" minValue="20e-9" maxValue="" defValue="1e-6" units="s" type="EditBox" toolTips="Pulse width time" />
+      <param name="riseTime" value="1e-4" minValue="20e-9" maxValue="" defValue="1e-4" units="s" type="EditBox" toolTips="Pulse Rise Time" />
+      <param name="delayTime" value="1e-4" minValue="20e-9" maxValue="" defValue="1e-4" units="s" type="EditBox" toolTips="Delay between sweeps" />
+    </Group>
+    <Group name="Reset Pulse" position="11">
+      <param name="resetV" value="-3.0" minValue="-20" maxValue="20" defValue="-2.5" units="V" type="EditBox" toolTips="Amplitude of the RESET pulse" />
+      <param name="resetIcomp" value="0.0" minValue="-0.1" maxValue="0.1" defValue="0.0" units="A" type="EditBox" toolTips="Current compliance for RESET pulse" />
+    </Group>
+    <Group name="Pulse" position="12">
+      <param name="Vin" value="0.0" minValue="-20" maxValue="20" defValue="0.0" units="V" type="EditBox" toolTips="Initial amplitude of the incremental pulse" />
+      <param name="stepIncrement" value="0.0" minValue="-1" maxValue="1" defValue="0.0" units="V" type="EditBox" toolTips="Amplitude increment" />
+      <param name="zone_low" value="0.0"  defValue="0.0" units="Ohms" type="EditBox" toolTips="Lower bound of zone" />
+      <param name="zone_high" value="0.0" defValue="0.0" units="Ohms" type="EditBox" toolTips="Upper bound of zone" />
+    </Group>
+    <Group name="Settings" position="2">
+      <param name="useSmu" value="" minValue="0" maxValue="1" defValue="0" units="" type="ListBox" toolTips="Use SMU or PMU for testing">
+        <listItems selItem="use SMU">
+          <item Name="use SMU" Val="1" />
+          <item Name="use PMU" Val="0" />
+        </listItems>
+      </param>
+      <param name="complianceCH" value="" minValue="1" maxValue="2" defValue="2" units="" type="ListBox" toolTips="Which RPM (1 or 2) to use for current limit">
+        <listItems selItem="Channel 2">
+          <item Name="Channel 1" Val="1" />
+          <item Name="Channel 2" Val="2" />
+        </listItems>
+      </param>
+      <param name="Irange" value="" minValue="0.0" maxValue="1" defValue="1e-2" units="A" type="ListBox" toolTips="Current range">
+        <listItems selItem="10 mA">
+          <item Name="Auto" Val="0" Condition="useSmu=1" />
+          <item Name="100 mA" Val="0.1" Condition="useSmu=1" />
+          <item Name="10 mA" Val="0.01" />
+          <item Name="1 mA" Val="0.001" />
+          <item Name="100 uA" Val="0.0001" />
+          <item Name="10 uA" Val="1E-005" />
+          <item Name="1 uA" Val="1E-006" Condition="useSmu=1" />
+          <item Name="100 nA" Val="1E-007" Condition="useSmu=1" />
+          <item Name="10 nA" Val="1E-008" Condition="useSmu=1" />
+          <item Name="1 nA" Val="1E-009" Condition="useSmu=1" />
+          <item Name="100 pA" Val="1E-010" Condition="useSmu=1" />
+        </listItems>
+      </param>
+      <param name="resTestV" value=".5" minValue="-10" maxValue="10" defValue=".5" units="V" type="EditBox" toolTips="Voltage used to measure resistance" />
+      <param name="takeRmeas" value="1" minValue="0" maxValue="1" defValue="1" units="" type="CheckBox" toolTips="Measure resistance" />
+    </Group>
+    <Group name="Miscellaneous" position="0">
+      <param name="loop_num" value="1" minValue="1" maxValue="1000" defValue="1" units="" type="EditBox" toolTips="Number of consecutive tests (NOT PULSES!)" />
+      <param name="Out_size_val" value="1000" minValue="10" maxValue="1000000" defValue="1000" units="" type="EditBox" toolTips="Voltage array. All arrays should have the same size." />
+      <param name="time_limit" value="1" minValue="1" maxValue="10000" defValue="1" units="min" type="EditBox" toolTips="Duration of execution [Minutes]" />
+    </Group>
+  </Module>

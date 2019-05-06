@@ -1,17 +1,17 @@
+##Introduction
 
+chris_man_memstress.c is a module designed to implement ISPP(Incremental Step Pulse Programming) and ECC(Error Checking/Correction) algorithm in Flash memories. More info about this algorithm can be found [here](https://ieeexplore.ieee.org/document/7942019/citations?tabFilter=papers#citations) 
 
-Introduction:
-chris_man_memstress.c is a module designed to implement ISPP(Incremental Step Pulse Programming) and ECC(Error Checking/Correction) algorithm in Flash memories. 
+This module was developed in favor of Electronic Nanomaterials and Devices Group of National Technical University of Athens (NTUA). 
 
-
-Requirements:
+##Requirements
 
 Keithley 4200-Semiconductor Characterization System.
 *This module has been tested succesfully on this system, however it can be ported to other systems.*
 NVM Keithley library.
 
 
-Installation:
+##Installation
 
 Due to copyright issues, chris_man_memstress.c should be installed with the following steps:
 
